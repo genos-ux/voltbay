@@ -4,7 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan"
 import "dotenv/config";
 import router from "./routes/product.js";
-import { sql } from "../config/db.js";
+import { sql } from "./config/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -15,7 +15,7 @@ app.use(cors());
 app.use(helmet()); // helmet is a security middleware that helps you protect your app by setting various HTTP headers.
 app.use(morgan("dev")) // log the requests.
 
-app.use('/api/products',router);
+app.use('/api/products/',router);
 
 async function initDB(){
     try {
