@@ -4,7 +4,7 @@ import axios from "axios"
 const BASE_URL = "http://localhost:4000"
 
 
-export const useProductStore = create((set,get) => ({
+export const useProductStore = create((set) => ({
     // products state
     products: [],
     loading: false,

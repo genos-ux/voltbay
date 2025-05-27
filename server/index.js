@@ -5,7 +5,7 @@ import morgan from "morgan";
 import "dotenv/config";
 import router from "./routes/product.js";
 import { sql } from "./config/db.js";
-import { aj } from "./lib/arcjet.js";
+import { arcjetMiddleware } from "./middleware/arcjet.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -17,37 +17,7 @@ app.use(helmet()); // helmet is a security middleware that helps you protect you
 app.use(morgan("dev")); // log the requests.
 
 // apply arcjet rate-limit to all routes
-app.use(async (req, res, next) => {
-  try {
-    const decision = await aj.protect(req, {
-      requested: 1, // specifies that each  request consumes 1 token
-    });
-
-    if (decision.isDenied()) {
-      if (decision.reason.isRateLimit()) {
-        res.status(429).json({
-          error: "Too many Requests",
-        });
-      }else if(decision.reason.isBot()){
-        res.status(403).json({error: "Bot access denied"});
-      }else{
-        res.status(403).json({error: "Forbidden"});
-      }
-      return
-    }
-
-    // check for spoofed bots
-    if(decision.results.some((result)=> result.reason.isBot() && result.reason.isSpoofed())){
-        res.status(403).json({error: "Spoofed bot detected."});
-        return;
-    }
-
-    next()
-  } catch (error) {
-    console.log("Arcjet error", error);
-    next(error);
-  }
-});
+app.use(arcjetMiddleware);
 
 app.use("/api/products/", router);
 
