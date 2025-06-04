@@ -15,6 +15,7 @@ function ProductCard({ product }) {
         />
       </div>
 
+
       {/* PRODUCT INFO */}
       <div className="card-body">
         <h2 className="card-title text-lg font-semibold">{product.name}</h2>

@@ -75,20 +75,26 @@ export const updateProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
     try {
-        const productId = parseInt(req.params.id);
+      const productId = parseInt(req.params.id);
 
-        const deletedProduct = await sql`
-            DELETE from products 
-            WHERE id = ${productId}
-        `
+      const deletedProduct = await sql`
+          DELETE FROM products 
+          WHERE id = ${productId}
+          RETURNING *;
+        `;
 
-        // Check if product is not found
-        if(deletedProduct.length == 0) return res.status(404).json({success: false, message: "Product not found."})
+      if (deletedProduct.length === 0) {
+        return res
+          .status(404)
+          .json({ success: false, message: "Product not found." });
+      }
 
-        return res.status(200).json({success: true, data: deletedProduct[0]});
-        
+      return res.status(200).json({ success: true, data: deletedProduct[0] });
     } catch (error) {
-        console.log("Error in deleteProduct function",error);
-        res.status(500).json({success:false, message: "Internal Server Error."});
+      console.error("Error in deleteProduct function", error);
+      res
+        .status(500)
+        .json({ success: false, message: "Internal Server Error." });
     }
+      
 }
